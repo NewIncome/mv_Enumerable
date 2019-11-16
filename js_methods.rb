@@ -61,10 +61,24 @@ module Enumerable
     end
   end
 
+  def my_map
+    arr = []
+    if block_given?
+      self.my_each do |e|
+        elm = yield e
+        arr << elm
+      end
+      arr
+    else
+      self.to_enum
+    end
+  end
+
 end
 
 my_hash = { "a" => 1, "b" => 2, "c": 3, "d": 4 }
-my_array = %w[ a b c d e ]
+my_l_array = %w[ a b c d e ]
+my_n_array = [1, 2, 3, 4]
 # { "a": 1, "b": 2, "c": 3, "d": 4 }.my_each { |k, v| puts "key: #{k}, val: #{v}" }
 # puts "true? #{e}, temp: #{temp}, acc: #{temp_arr}"
 my_hash.each_with_index { |k, v| p "key: #{k}, val: #{v}" }; puts
@@ -79,6 +93,13 @@ puts [2, 4, 6].my_any? { |n| n % 2 != 0 }
 puts [2, 4, 6].my_none? { |n| n % 2 != 0 }
 
 puts [2, 3, 2].my_count(2)
+
+p my_n_array.each { |e| e + 1 }
+p my_n_array.my_each { |e| e + 1 }; puts
+p my_n_array.map { |e| e + 1 }
+p my_n_array.my_map { |e| e + 1 }
+p my_n_array.map
+p my_n_array.my_map
 
 # rubocop:enable Style/LineLength, Style/StringLiterals, Style/CaseEquality
 # //cop  <-- configuration option
