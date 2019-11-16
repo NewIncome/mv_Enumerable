@@ -51,6 +51,16 @@ module Enumerable
     ans
   end
 
+  def my_count(*chr) # why can't use *char ???
+    cnt = 0; char = *chr
+    unless char.empty?
+      self.my_each { |e| cnt += 1 if e == char[0] }
+      cnt
+    else
+      self.length
+    end
+  end
+
 end
 
 my_hash = { "a" => 1, "b" => 2, "c": 3, "d": 4 }
@@ -67,6 +77,8 @@ puts [2, 4, 6].my_all? { |n| n % 2 == 0 }
 puts [2, 4, 6].my_any? { |n| n % 2 != 0 }
 
 puts [2, 4, 6].my_none? { |n| n % 2 != 0 }
+
+puts [2, 3, 2].my_count(2)
 
 # rubocop:enable Style/LineLength, Style/StringLiterals, Style/CaseEquality
 # //cop  <-- configuration option
