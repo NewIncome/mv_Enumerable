@@ -96,7 +96,9 @@ module Enumerable
     acc
   end
 
-
+  def self.multiply_els(arr)
+    arr.my_inject(:*)
+  end
 
 end
 
@@ -129,6 +131,8 @@ p my_n_array.inject { |a, b| a * b }
 p my_n_array.my_inject { |a, b| a * b }
 p my_n_array.inject(2, :+)
 p my_n_array.my_inject(2, :+)
+
+p Enumerable.multiply_els([2,4,5])
 
 #p my_n_array.my_inject
 # rubocop:enable Style/LineLength, Style/StringLiterals, Style/CaseEquality
