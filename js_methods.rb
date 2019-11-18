@@ -74,6 +74,30 @@ module Enumerable
     end
   end
 
+  def my_inject(*init)
+    init, sym = *init
+    acc = init if init.is_a?(Fixnum)
+    if !sym.nil? || init.is_a?(Symbol)
+      sym = init if sym.nil? # to exchange values in case of 1 param.
+      self.my_each do |e|
+        acc = e and next if acc.nil? # to not sum 2times 1st value
+        acc += e if sym == :+
+        acc -= e if sym == :-
+        acc *= e if sym == :*
+        acc /= e if sym == :/
+      end
+      acc
+    elsif block_given?
+      self.my_each do |e|
+        acc = e and next if acc.nil? # to not sum 2times 1st value
+        acc = yield acc, e unless acc.nil?
+      end
+    end
+    acc
+  end
+
+
+
 end
 
 my_hash = { "a" => 1, "b" => 2, "c": 3, "d": 4 }
@@ -96,10 +120,16 @@ puts [2, 3, 2].my_count(2)
 
 p my_n_array.each { |e| e + 1 }
 p my_n_array.my_each { |e| e + 1 }; puts
-p my_n_array.map { |e| e + 1 }
-p my_n_array.my_map { |e| e + 1 }
+p my_n_array.map { |e| e * 2 }
+p my_n_array.my_map { |e| e * 2 }
 p my_n_array.map
 p my_n_array.my_map
+puts
+p my_n_array.inject { |a, b| a * b }
+p my_n_array.my_inject { |a, b| a * b }
+p my_n_array.inject(2, :+)
+p my_n_array.my_inject(2, :+)
 
+#p my_n_array.my_inject
 # rubocop:enable Style/LineLength, Style/StringLiterals, Style/CaseEquality
 # //cop  <-- configuration option
