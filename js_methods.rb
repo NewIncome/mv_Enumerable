@@ -111,32 +111,30 @@ def self.multiply_els(arr)
 end
 
 my_hash = { "a" => 1, "b" => 2, "c": 3, "d": 4 }
-my_lt_array = %w[a b c d e]
 my_n_array = [1, 2, 3, 4]
-# { "a": 1, "b": 2, "c": 3, "d": 4 }.my_each { |k, v| puts "key: #{k}, val: #{v}" }
-# puts "true? #{e}, temp: #{temp}, acc: #{temp_arr}"
+
 my_hash.each_with_index { |k, v| p "key: #{k}, val: #{v}" }
 my_hash.my_each_with_index { |k, v| p "key: #{k}, val: #{v}" }
+puts "my_select"
+puts([1, 2, 3, 4, 5].my_select(&:odd?))
+puts "my_all?"
+puts([2, 4, 6].my_all?(&:even?))
+puts "my_any?"
+puts([2, 4, 6].my_any?(&:odd?))
+puts "my_none?"
+puts([2, 4, 6].my_none?(&:odd?))
+puts "my_count"
+puts([2, 3, 2].my_count(2))
 
-puts [1, 2, 3, 4, 5].my_select { |n| n % 2 != 0 }
-
-puts [2, 4, 6].my_all? { |n| n % 2 == 0 }
-
-puts [2, 4, 6].my_any? { |n| n % 2 != 0 }
-
-puts [2, 4, 6].my_none? { |n| n % 2 != 0 }
-
-puts [2, 3, 2].my_count(2)
-
-p my_n_array.each { |e| e + 1 }
-p my_n_array.my_each { |e| e + 1 }
-p "map method"
-p my_n_array.map { |e| e * 2 }
-p my_n_array.my_map { |e| e * 2 }
+my_n_array.each { |e| print "e+2: #{e + 2};" }
+my_n_array.my_each { |e| p "e+2: #{e + 2}" }
+p "-----map method-----"
+p(my_n_array.map { |e| e * 2 })
+p(my_n_array.my_map { |e| e * 2 })
 p my_n_array.map
 p my_n_array.my_map
-p my_n_array.inject { |a, b| a * b }
-p (my_n_array.my_inject { |a, b| a * b })
+p(my_n_array.inject { |a, b| a * b })
+p(my_n_array.my_inject { |a, b| a * b })
 p my_n_array.inject(2, :+)
 p my_n_array.my_inject(2, :p)
 my_n_array.my_inject { |a, b| a * b }
