@@ -96,10 +96,18 @@ module Enumerable
     acc
   end
 
-  def self.multiply_els(arr)
-    arr.my_inject(:*)
+  def my_map_bproc(&bproc)
+    arr = []
+    self.my_each do |e|
+      arr << bproc.call(e)
+    end
+    arr
   end
 
+end
+
+def self.multiply_els(arr)
+  arr.my_inject(:*)
 end
 
 my_hash = { "a" => 1, "b" => 2, "c": 3, "d": 4 }
@@ -121,7 +129,8 @@ puts [2, 4, 6].my_none? { |n| n % 2 != 0 }
 puts [2, 3, 2].my_count(2)
 
 p my_n_array.each { |e| e + 1 }
-p my_n_array.my_each { |e| e + 1 }; puts
+p my_n_array.my_each { |e| e + 1 }
+puts; p "map method"
 p my_n_array.map { |e| e * 2 }
 p my_n_array.my_map { |e| e * 2 }
 p my_n_array.map
@@ -132,7 +141,15 @@ p my_n_array.my_inject { |a, b| a * b }
 p my_n_array.inject(2, :+)
 p my_n_array.my_inject(2, :+)
 
-p Enumerable.multiply_els([2,4,5])
+p multiply_els([2,4,5])
+puts
+bproc = Proc.new { |e| p "Test: #{e}" }
+[1, 2, ""].my_map_bproc(&bproc)
+[1, 2, ""].map { |e| p "Test: #{e}" }
+[1, 2, ""].my_map(&bproc)
+[1, 2, ""].map(&bproc)
+[1, 2, ""].map { |e| p "Test: #{e}" }
+# .send   , checkITout
 
 #p my_n_array.my_inject
 # rubocop:enable Style/LineLength, Style/StringLiterals, Style/CaseEquality
