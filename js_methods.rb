@@ -136,7 +136,7 @@ p my_n_array.my_map { |e| e * 2 }
 p my_n_array.map
 p my_n_array.my_map
 p my_n_array.inject { |a, b| a * b }
-p my_n_array.my_inject { |a, b| a * b }
+p (my_n_array.my_inject { |a, b| a * b })
 p my_n_array.inject(2, :+)
 p my_n_array.my_inject(2, :p)
 my_n_array.my_inject { |a, b| a * b }
@@ -150,6 +150,6 @@ bproc = proc { |e| p "Test: #{e}" }
 [1, 2, ""].map(&bproc)
 [1, 2, ""].map { |e| p "Test: #{e}" }
 # .send   , checkITout
-
+p my_hash.key(2)
 # rubocop:enable Style/StringLiterals
 # //cop  <-- configuration option
