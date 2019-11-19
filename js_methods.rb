@@ -116,7 +116,6 @@ my_n_array = [1, 2, 3, 4]
 # { "a": 1, "b": 2, "c": 3, "d": 4 }.my_each { |k, v| puts "key: #{k}, val: #{v}" }
 # puts "true? #{e}, temp: #{temp}, acc: #{temp_arr}"
 my_hash.each_with_index { |k, v| p "key: #{k}, val: #{v}" }
-puts
 my_hash.my_each_with_index { |k, v| p "key: #{k}, val: #{v}" }
 
 puts [1, 2, 3, 4, 5].my_select { |n| n % 2 != 0 }
@@ -137,13 +136,12 @@ p my_n_array.my_map { |e| e * 2 }
 p my_n_array.map
 p my_n_array.my_map
 p my_n_array.inject { |a, b| a * b }
-p my_n_array.my_inject {|a, b| a * b}
+p my_n_array.my_inject { |a, b| a * b }
 p my_n_array.inject(2, :+)
 p my_n_array.my_inject(2, :p)
 my_n_array.my_inject { |a, b| a * b }
 
 p multiply_els([2, 4, 5])
-puts
 bproc = proc { |e| p "Test: #{e}" }
 [1, 2, ""].my_map_bproc(&bproc)
 [1, 2, ""].my_map_bproc { |e| p "Test: #{e}" }
