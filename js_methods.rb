@@ -4,15 +4,17 @@
 
 module Enumerable
   def my_each
-    for e in self
-      yield e if block_given?
+    i = 0
+    while i < length
+      yield to_a[i] if block_given?
+      i += 1
     end
   end
 
   def my_each_with_index
     i = 0
-    for e in self
-      yield e, i if block_given?
+    while i < length
+      yield to_a[i], i if block_given?
       i += 1
     end
   end
@@ -112,7 +114,7 @@ end
 
 my_hash = { "a" => 1, "b" => 2, "c": 3, "d": 4 }
 my_n_array = [1, 2, 3, 4]
-
+p "----- my_each_with_index method -----"
 my_hash.each_with_index { |k, v| p "key: #{k}, val: #{v}" }
 my_hash.my_each_with_index { |k, v| p "key: #{k}, val: #{v}" }
 puts "my_select"
@@ -148,6 +150,13 @@ bproc = proc { |e| p "Test: #{e}" }
 [1, 2, ""].map(&bproc)
 [1, 2, ""].map { |e| p "Test: #{e}" }
 # .send   , checkITout
-p my_hash.key(2)
+puts "--- .each & my_each with hash ---"
+my_hash.each { |k, v| p "#{k}, #{v}" }
+my_hash.my_each { |k, v| p "#{k}, #{v}" }
+my_hash.each { |k| p k }
+my_hash.my_each { |k| p k }
+puts "--- .each & my_each with array ---"
+my_n_array.each { |k, v| p "#{k}, #{v}" }
+my_n_array.my_each { |k, v| p "#{k}, #{v}" }
 # rubocop:enable Style/StringLiterals
 # //cop  <-- configuration option
