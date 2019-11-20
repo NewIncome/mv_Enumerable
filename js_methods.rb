@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Style/StringLiterals
+# rubocop:disable Style/StringLiterals, Style/AndOr
 
 module Enumerable
   def my_each
@@ -79,22 +79,14 @@ module Enumerable
 
   def my_inject(*init)
     init, sym = *init
-    acc = init if init.is_a?(Integer)
-    if !sym.nil? || init.is_a?(Symbol)
-      sym = init if sym.nil? # to exchange values in case of 1 param.
-      my_each do |e|
-        acc = e && next if acc.nil? # to not sum 2times 1st value
-        acc += e if sym == :+
-        acc -= e if sym == :-
-        acc *= e if sym == :*
-        acc /= e if sym == :/
-      end
-      acc
-    elsif block_given?
-      my_each do |e|
-        acc = e && next if acc.nil? # to not sum 2times 1st value
-        acc = yield acc, e unless acc.nil?
-      end
+    init.is_a?(Integer) ? acc = init : sym = init
+    my_each do |e|
+      acc = e and next if acc.nil? # to not sum 2times 1st value
+      acc = if block_given? # because if and else asign to the same variable
+              yield acc, e
+            else
+              acc.send(sym, e)
+            end
     end
     acc
   end
@@ -130,18 +122,23 @@ puts([2, 3, 2].my_count(2))
 
 my_n_array.each { |e| print "e+2: #{e + 2};" }
 my_n_array.my_each { |e| p "e+2: #{e + 2}" }
-p "-----map method-----"
+p "----- map method -----"
 p(my_n_array.map { |e| e * 2 })
 p(my_n_array.my_map { |e| e * 2 })
 p my_n_array.map
 p my_n_array.my_map
+p "----- my_inject method with array -----"
 p(my_n_array.inject { |a, b| a * b })
 p(my_n_array.my_inject { |a, b| a * b })
-p my_n_array.inject(2, :+)
-p my_n_array.my_inject(2, :p)
-my_n_array.my_inject { |a, b| a * b }
-
+p "----- my_inject method with Symbol -----"
+p my_n_array.inject(1, :*)
+p my_n_array.my_inject(1, :*)
+p(my_n_array.my_inject(3) { |a, b| a * b })
+p my_n_array.inject(:+)
+p my_n_array.my_inject(:+)
+p "----- multiply_els -----"
 p multiply_els([2, 4, 5])
+p "----- my_map method with Proc -----"
 bproc = proc { |e| p "Test: #{e}" }
 [1, 2, ""].my_map_bproc(&bproc)
 [1, 2, ""].my_map_bproc { |e| p "Test: #{e}" }
@@ -158,5 +155,6 @@ my_hash.my_each { |k| p k }
 puts "--- .each & my_each with array ---"
 my_n_array.each { |k, v| p "#{k}, #{v}" }
 my_n_array.my_each { |k, v| p "#{k}, #{v}" }
-# rubocop:enable Style/StringLiterals
+# rubocop:enable Style/StringLiterals, Style/AndOr
 # //cop  <-- configuration option
+p 5.send(:+, 3)
