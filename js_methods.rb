@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+  # frozen_string_literal: true
 
 # rubocop:disable Style/StringLiterals, Style/AndOr
 
@@ -100,7 +100,7 @@ module Enumerable
   end
 end
 
-def self.multiply_els(arr)
+def multiply_els(arr)
   arr.my_inject(:*)
 end
 
