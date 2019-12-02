@@ -1,7 +1,3 @@
-# frozen_string_literal: true
-
-# rubocop:disable Style/StringLiterals, Style/AndOr, CyclomaticComplexity, PerceivedComplexity, ModuleLength
-
 module Enumerable
   def my_each
     return to_enum(__method__) unless block_given?
@@ -75,7 +71,6 @@ module Enumerable
   end
 
   def my_count(*chr)
-    # why can't use *char directly???
     cnt = 0
     char = *chr
     if block_given?
@@ -107,8 +102,8 @@ module Enumerable
     init.is_a?(Integer) ? acc = init : sym = init
     if block_given? || !sym.empty?
       my_each do |e|
-        acc = e and next if acc.nil? # to not sum 2times 1st value
-        acc = if block_given? # because if and else asign to the same variable
+        acc = e and next if acc.nil?
+        acc = if block_given?
                 yield acc, e
               else
                 acc.send(sym, e)
@@ -180,7 +175,6 @@ bproc = proc { |e| p "Test: #{e}" }
 [1, 2, ""].my_map { |e| p "Test: #{e}" }
 [1, 2, ""].map(&bproc)
 [1, 2, ""].map { |e| p "Test: #{e}" }
-# .send   , checkITout
 puts '--- .each & my_each with hash ---'
 my_hash.each { |k, v| p "#{k}, #{v}" }
 my_hash.my_each { |k, v| p "#{k}, #{v}" }
@@ -249,5 +243,3 @@ p(my_n_array.inject(3) { |a, b| a * b })
 p(my_n_array.my_inject(3) { |a, b| a * b })
 p my_n_array.inject(:+)
 p my_n_array.my_inject(:+)
-# rubocop:enable Style/StringLiterals, Style/AndOr, CyclomaticComplexity, PerceivedComplexity, ModuleLength
-# //cop  <-- configuration option
