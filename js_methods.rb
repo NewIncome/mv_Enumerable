@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Enumerable
   def my_each
     return to_enum(__method__) unless block_given?
@@ -169,12 +171,12 @@ p '----- multiply_els -----'
 p multiply_els([2, 4, 5])
 p '----- my_map method with Proc -----'
 bproc = proc { |e| p "Test: #{e}" }
-[1, 2, ""].my_map_bproc(&bproc)
-[1, 2, ""].my_map_bproc { |e| p "Test: #{e}" }
-[1, 2, ""].my_map(&bproc)
-[1, 2, ""].my_map { |e| p "Test: #{e}" }
-[1, 2, ""].map(&bproc)
-[1, 2, ""].map { |e| p "Test: #{e}" }
+[1, 2, ''].my_map_bproc(&bproc)
+[1, 2, ''].my_map_bproc { |e| p "Test: #{e}" }
+[1, 2, ''].my_map(&bproc)
+[1, 2, ''].my_map { |e| p "Test: #{e}" }
+[1, 2, ''].map(&bproc)
+[1, 2, ''].map { |e| p "Test: #{e}" }
 puts '--- .each & my_each with hash ---'
 my_hash.each { |k, v| p "#{k}, #{v}" }
 my_hash.my_each { |k, v| p "#{k}, #{v}" }
