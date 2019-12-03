@@ -4,21 +4,17 @@ module Enumerable
   def my_each
     return to_enum(__method__) unless block_given?
 
-    i = 0
-    while i < length
-      yield to_a[i] if block_given?
-      i += 1
+    @i = 0
+    while @i < size
+      yield to_a[@i] if block_given?
+      @i += 1
     end
   end
 
   def my_each_with_index
     return to_enum(__method__) unless block_given?
 
-    i = 0
-    while i < length
-      yield to_a[i], i if block_given?
-      i += 1
-    end
+    my_each {|e| yield e, @i }
   end
 
   def my_select
@@ -32,22 +28,17 @@ module Enumerable
     temp_arr
   end
 
+## Clone the Enumerable method:
+
   def my_all?(*vars)
-    ans = true
-    if block_given?
-      my_each { |e| ans = false unless yield e }
-    elsif !vars.empty?
-      if vars[0].is_a?(Class) # 2/4
-        my_each { |e| ans = false unless e.is_a?(vars[0]) }
-      elsif vars[0].is_a?(Regexp) # 3/4
-        my_each { |e| ans = false unless e =~ vars[0] }
-      else
-        my_each { |e| ans = false unless e == vars[0] } # 4/4
-      end
+    my_each { |e| return false unless yield e } if block_given?
+    my_each { |e| return false if e == false || !e.nil? } if vars.empty?
+    if vars[0].is_a?(Class)
+      my_each { |e| return false unless e.is_a?(vars[0]) }
     else
-      my_each { |e| ans = false if e == false || e.nil? } # 1/4
+      vars[0].is_a?(Regexp) ? my_each { |e| return false unless e =~ vars[0] } : my_each { |e| return false unless e == vars[0] }
     end
-    ans
+    true
   end
 
   def my_any?(*vars)
@@ -130,73 +121,6 @@ end
 
 my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 my_n_array = [1, 2, 3, 4]
-p '----- my_each_with_index method -----'
-my_hash.each_with_index { |k, v| p "key: #{k}, val: #{v}" }
-my_hash.my_each_with_index { |k, v| p "key: #{k}, val: #{v}" }
-p 'my_select'
-puts([1, 2, 3, 4, 5].my_select(&:odd?))
-puts([1, 2, 3, 4, 5].select(&:odd?))
-puts([1, 2, 3, 4, 5].my_select)
-puts([1, 2, 3, 4, 5].select)
-p 'my_all?'
-puts([2, 4, 6].my_all?(&:even?))
-p 'my_any?'
-puts([2, 4, 6].my_any?(&:odd?))
-p 'my_none?'
-puts([2, 4, 6].my_none?(&:odd?))
-p 'my_count'
-puts([2, 3, 2].my_count(2))
-puts([2, 3, 2].count(2))
-
-my_n_array.each { |e| print "e+2: #{e + 2};" }
-my_n_array.my_each { |e| p "e+2: #{e + 2}" }
-my_n_array.each
-my_n_array.my_each
-p '----- map method -----'
-p(my_n_array.map { |e| e * 2 })
-p(my_n_array.my_map { |e| e * 2 })
-p my_n_array.map
-p my_n_array.my_map
-p '----- my_inject method with array -----'
-p(my_n_array.inject { |a, b| a * b })
-p(my_n_array.my_inject { |a, b| a * b })
-p '----- my_inject method with Symbol -----'
-p my_n_array.inject(1, :*)
-p my_n_array.my_inject(1, :*)
-p(my_n_array.inject(3) { |a, b| a * b })
-p(my_n_array.my_inject(3) { |a, b| a * b })
-p my_n_array.inject(:+)
-p my_n_array.my_inject(:+)
-p '----- multiply_els -----'
-p multiply_els([2, 4, 5])
-p '----- my_map method with Proc -----'
-bproc = proc { |e| p "Test: #{e}" }
-[1, 2, ''].my_map_bproc(&bproc)
-[1, 2, ''].my_map_bproc { |e| p "Test: #{e}" }
-[1, 2, ''].my_map(&bproc)
-[1, 2, ''].my_map { |e| p "Test: #{e}" }
-[1, 2, ''].map(&bproc)
-[1, 2, ''].map { |e| p "Test: #{e}" }
-puts '--- .each & my_each with hash ---'
-my_hash.each { |k, v| p "#{k}, #{v}" }
-my_hash.my_each { |k, v| p "#{k}, #{v}" }
-my_hash.each { |k| p k }
-my_hash.my_each { |k| p k }
-puts '--- .each & my_each with array ---'
-my_n_array.each { |k, v| p "#{k}, #{v}" }
-my_n_array.my_each { |k, v| p "#{k}, #{v}" }
-
-p my_hash.all?
-p my_hash.my_all?
-p 'my_all 4 Class'
-p [1, 2, 3].all?(Numeric)
-p [1, 2, 3].my_all?(Numeric)
-p 'my_all 4 Regex'
-p %w[d 2d d].all?(/r/)
-p %w[d 2d d].my_all?(/r/)
-p 'my_all 4 Pattern'
-p [3, 3, 2].all?(3)
-p [3, 3, 2].my_all?(3)
 
 puts
 p 'my_none simple_w_hash'
@@ -211,20 +135,6 @@ p %w[d 2d d].my_none?(/r/)
 p 'my_none 4 Pattern'
 p [3, 3, 2].none?(3)
 p [3, 3, 2].my_none?(3)
-
-puts
-p 'my_any simple_w_hash'
-p my_hash.any?
-p my_hash.my_any?
-p 'my_any 4 Class'
-p [1, 2, 'd'].any?(Numeric)
-p [1, 2, 'd'].my_any?(Numeric)
-p 'my_any 4 Regex'
-p %w[d 2d d].any?(/r/)
-p %w[d 2d d].my_any?(/r/)
-p 'my_any 4 Pattern'
-p [3, 3, 2].any?(3)
-p [3, 3, 2].my_any?(3)
 
 p 'my_count'
 puts([2, 3, 2].my_count(2))
@@ -245,3 +155,55 @@ p(my_n_array.inject(3) { |a, b| a * b })
 p(my_n_array.my_inject(3) { |a, b| a * b })
 p my_n_array.inject(:+)
 p my_n_array.my_inject(:+)
+# p '===================================='
+# p '======== MY_ALL method tests ========'
+# aproc = proc { |e| p "- #{e}" }
+# p '----- my_all 4 e Arrays -----'
+# puts "#{[1, 2, 3].all?}, #{[1, nil, 3].all?}, #{[nil, nil, nil].all?}"
+# puts "#{[1, 2, 3].my_all?}, #{[1, nil, 3].my_all?}, #{[nil, nil, nil].my_all?}"
+# p '----- my_all 4 e Hashes -----'
+# puts my_hash.all?
+# puts my_hash.my_all?
+# p '----- my_all 4 Class -----'
+# puts "#{[1, 2, 3].all?(Numeric)}, #{['1', '2', '3'].all?(Numeric)}"
+# puts "#{[1, 2, 3].my_all?(Numeric)}, #{['1', '2', '3'].my_all?(Numeric)}"
+# p '----- my_all 4 Regex -----'
+# puts "#{%w[d 2d d].all?(/d/)}, #{%w[d 2d r].all?(/d/)}"
+# puts "#{%w[d 2d d].my_all?(/d/)}, #{%w[d 2d r].my_all?(/d/)}"
+# p '----- my_all 4 Pattern -----'
+# puts "#{[3, 3, 3].all?(3)}, #{[3, 3, 2].all?(3)}"
+# puts "#{[3, 3, 3].my_all?(3)}, #{[3, 3, 2].my_all?(3)}"
+# p '----- my_all 4 Proc -----'
+# puts "#{[2, 4, 6].all?(&aproc)}, #{[2, 4, 6].all?(&aproc)}"
+# puts "#{[2, 4, 6].my_all?(&aproc)}, #{[2, 4, 6].my_all?(&aproc)}"
+# p '===================================='
+
+puts
+p '===================================='
+p '======== MY_EACH method tests ========'
+p '----- MY_EACH w/my_array -----'
+my_n_array.each { |e| print "elm: #{e + 2}; " }; puts
+my_n_array.my_each { |e| print "elm: #{e + 2}; " }; puts
+p my_n_array.each
+p my_n_array.my_each
+(1..4).each { |e| print "e: #{e}; " }; puts
+(1..4).my_each { |e| print "e: #{e}; " }; puts
+puts
+p '----- MY_EACH w/my_hash -----'
+my_hash.each { |e| print "elm: #{e}; " }; puts
+my_hash.my_each { |e| print "elm: #{e}; " }; puts
+p my_hash.each
+p my_hash.my_each
+puts
+p '----- MY_EACH_with_index w/my_array -----'
+my_n_array.each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
+my_n_array.my_each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
+p my_n_array.each_with_index
+p my_n_array.my_each_with_index
+puts
+p '----- MY_EACH_with_index w/my_hash -----'
+my_hash.each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
+my_hash.my_each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
+p my_hash.each_with_index
+p my_hash.my_each_with_index
+p '===================================='
