@@ -80,7 +80,8 @@ module Enumerable
   def my_map(&zproc)
     arr = []
     if block_given? && zproc.is_a?(Proc)
-      my_each { |e| zproc.call(e) }
+      my_each { |e| arr << zproc.call(e) }
+      arr
     elsif block_given?
       my_each { |e| arr << (yield e) }
       arr
