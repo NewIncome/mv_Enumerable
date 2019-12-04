@@ -5,16 +5,15 @@ module Enumerable
     return to_enum(__method__) unless block_given?
 
     @i = 0
-    while @i < size
+    while @i < to_a.size
       yield to_a[@i] if block_given?
       @i += 1
     end
+    self
   end
 
   def my_each_with_index
-    return to_enum(__method__) unless block_given?
-
-    my_each { |e| yield e, @i }
+    block_given? ? my_each { |e| yield e, @i } : to_enum(__method__)
   end
 
   def my_select
@@ -26,11 +25,11 @@ module Enumerable
   end
 
   def my_all?(*vrs)
-    #p "value: #{vrs}, empty? #{vrs.empty?}, class?#{vrs.class}, value[0]: #{vrs[0]}"
-    #p "is it a class type? #{vrs[0].is_a?(Class)}"
-    my_each { |e| return false unless yield e } if block_given?
-    my_each { |e| return false unless e.is_a?(vrs[0]) } if vrs[0].is_a?(Class)
-    if vrs[0].is_a?(Regexp) || vrs[0].is_a?(Numeric) || vrs[0].is_a?(String)
+    if block_given?
+      my_each { |e| return false unless yield e }
+    elsif vrs[0].is_a?(Class)
+      my_each { |e| return false unless e.is_a?(vrs[0]) }
+    elsif vrs[0].is_a?(Regexp) || vrs[0].is_a?(Numeric) || vrs[0].is_a?(String)
       vrs[0].is_a?(Regexp) ? my_each { |e| return false if e !~ vrs[0] } : my_each { |e| return false if e != vrs[0] }
     else
       my_each { |e| return false unless e }
@@ -38,26 +37,30 @@ module Enumerable
     true
   end
 
-  def my_any?(*vars)
-    !my_none?(*vars)
+  def my_none?(*vrs)
+    if block_given?
+      my_each { |e| return false if yield e }
+    elsif vrs[0].is_a?(Class)
+      my_each { |e| return false if e.is_a?(vrs[0]) }
+    elsif vrs[0].is_a?(Regexp) || vrs[0].is_a?(Numeric) || vrs[0].is_a?(String)
+      vrs[0].is_a?(Regexp) ? my_each { |e| return false if e =~ vrs[0] } : my_each { |e| return false if e == vrs[0] }
+    else
+      my_each { |e| return false if e }
+    end
+    true
   end
 
-  def my_none?(*vars)
-    ans = true
+  def my_any?(*vrs)
     if block_given?
-      my_each { |e| ans = false if yield e }
-    elsif !vars.empty?
-      if vars[0].is_a?(Class) # 2/4
-        my_each { |e| ans = false if e.is_a?(vars[0]) }
-      elsif vars[0].is_a?(Regexp) # 3/4
-        my_each { |e| ans = false if e =~ vars[0] }
-      else
-        my_each { |e| ans = false if e == vars[0] } # 4/4
-      end
+      my_each { |e| return true if yield e }
+    elsif vrs[0].is_a?(Class)
+      my_each { |e| return true if e.is_a?(vrs[0]) }
+    elsif vrs[0].is_a?(Regexp) || vrs[0].is_a?(Numeric) || vrs[0].is_a?(String)
+      vrs[0].is_a?(Regexp) ? my_each { |e| return true if e =~ vrs[0] } : my_each { |e| return true if e == vrs[0] }
     else
-      my_each { |e| ans = false if e != false || e.nil? } # 1/4
+      my_each { |e| return true if e }
     end
-    ans
+    false
   end
 
   def my_count(*chr)
@@ -120,28 +123,6 @@ my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 my_n_array = [1, 2, 3, 4]
 
 puts
-p 'my_none simple_w_hash'
-p my_hash.none?
-p my_hash.my_none?
-p 'my_none 4 Class'
-p [1, 2, 'b'].none?(Numeric)
-p [1, 2, 'b'].my_none?(Numeric)
-p 'my_none 4 Regex'
-p %w[d 2d d].none?(/r/)
-p %w[d 2d d].my_none?(/r/)
-p 'my_none 4 Pattern'
-p [3, 3, 2].none?(3)
-p [3, 3, 2].my_none?(3)
-
-p 'my_count'
-puts([2, 3, 2].my_count(2))
-puts([2, 3, 2].count(2))
-puts([2, 3, 2].my_count { |e| (e % 3).zero? })
-puts([2, 3, 2].count { |e| (e % 3).zero? })
-puts([2, 3, 2].my_count)
-puts([2, 3, 2].count)
-
-puts
 p '----- my_inject method with array -----'
 p(my_n_array.inject { |a, b| a * b })
 p(my_n_array.my_inject { |a, b| a * b })
@@ -153,70 +134,30 @@ p(my_n_array.my_inject(3) { |a, b| a * b })
 p my_n_array.inject(:+)
 p my_n_array.my_inject(:+)
 
-# puts
-# p '===================================='
-# p '======== MY_EACH method tests ========'
-# p '----- MY_EACH w/my_array -----'
-# my_n_array.each { |e| print "elm: #{e + 2}; " }; puts
-# my_n_array.my_each { |e| print "elm: #{e + 2}; " }; puts
-# p my_n_array.each
-# p my_n_array.my_each
-# (1..4).each { |e| print "e: #{e}; " }; puts
-# (1..4).my_each { |e| print "e: #{e}; " }; puts
-# puts
-# p '----- MY_EACH w/my_hash -----'
-# my_hash.each { |e| print "elm: #{e}; " }; puts
-# my_hash.my_each { |e| print "elm: #{e}; " }; puts
-# p my_hash.each
-# p my_hash.my_each
-# puts
-# p '----- MY_EACH_with_index w/my_array -----'
-# my_n_array.each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
-# my_n_array.my_each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
-# p my_n_array.each_with_index
-# p my_n_array.my_each_with_index
-# puts
-# p '----- MY_EACH_with_index w/my_hash -----'
-# my_hash.each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
-# my_hash.my_each_with_index { |e, i| print "e: #{e}, i: #{i};  " }; puts
-# p my_hash.each_with_index
-# p my_hash.my_each_with_index
-# p '===================================='
-
-# p my_n_array.select(&aproc)
-# p my_n_array.my_select(&aproc)
-# p (1..6).select { |e| e.even? }
-# p (1..6).my_select { |e| e.even? }
-# p (1..6).select
-# p (1..6).my_select
-
 my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 aproc = proc { |e| e.even? }
-p '===================================='
-p '======== MY_ALL method tests ========'
-p '----- my_all 4 Arrays, empty param -----'
-puts "#{[1, 2, 3].all?}, #{[1, nil, 3].all?}, #{[].all?}"
-puts "#{[1, 2, 3].my_all?}, #{[1, nil, 3].my_all?}, #{[].my_all?}"
-p '----- my_all 4 Hashes -----'
-puts my_hash.all?
-puts my_hash.my_all?
-p '----- my_all 4 Ranges -----'
-puts "#{(1..3).all?}, #{(1..3).all? { |e| e.odd? }}, #{(1..3).all?(Numeric)}"
-puts "#{(1..3).my_all?}, #{(1..3).my_all? { |e| e.odd? }}, #{(1..3).my_all?(Numeric)}"
-p '----- my_all 4 Class -----'
-puts "#{[1, 2, 3].all?(Numeric)}, #{[1, 2, '3'].all?(Numeric)}"
-puts "#{[1, 2, 3].my_all?(Numeric)}, #{[1, 2, '3'].my_all?(Numeric)}"
-p '----- my_all 4 Regex -----'
-puts "#{%w[d 2d d].all?(/d/)}, #{%w[d 2d r].all?(/d/)}"
-puts "#{%w[d 2d d].my_all?(/d/)}, #{%w[d 2d r].my_all?(/d/)}"
-p '----- my_all 4 Pattern -----'
-puts "#{[3, 3, 3].all?(3)}, #{[3, 3, 2].all?(3)}"
-puts "#{[3, 3, 3].my_all?(3)}, #{[3, 3, 2].my_all?(3)}"
-p '----- my_all 4 Proc -----'
-print "#{[2, 4, 6].all?(&aproc)}, #{[2, 4, 6].all?(&aproc)}"; puts
-print "#{[2, 4, 6].my_all?(&aproc)}, #{[2, 4, 6].my_all?(&aproc)}"; puts
-p '----- my_all 4 Proc and block -----'
-#print "#{[2, 4, 6].all?(&aproc) { |e| e.odd? } }, #{[2, 4, 6].all?(&aproc) { |e| e.odd? } }"; puts
-#print "#{[2, 4, 6].my_all?(&aproc) { |e| e.odd? } }, #{[2, 4, 6].my_all?(&aproc) { |e| e.odd? } }"; puts
-p '===================================='
-p "".length
+bproc = proc { |e| e.length == 2 }
+p '======================================'
+p '======== My_COUNT method tests ========'
+p '----- my_count method w/Array & argument -----'
+puts [2, 3, 2].count(2)
+puts [2, 3, 2].my_count(2)
+p '----- my_count method w/Array & block / proc -----'
+puts "#{[2, 3, 2].count { |e| (e % 3).zero? }}, #{[2, 3, 2].count(&aproc)}"
+puts "#{[2, 3, 2].my_count { |e| (e % 3).zero? }}, #{[2, 3, 2].my_count(&aproc)}"
+p '----- my_count method w/Array & no block no arg -----'
+puts "#{[2, 3, 2].count}, #{[2, false, nil].count}, #{[false, nil, false].count}, #{[].count}"
+puts "#{[2, 3, 2].my_count}, #{[2, false, nil].my_count}, #{[false, nil, false].my_count}, #{[].my_count}"
+p '----- my_count method w/Hash & argument / no arg / arg-proc -----'
+puts "#{my_hash.count('a')}, #{my_hash.count}, #{my_hash.count(&bproc)}"
+puts "#{my_hash.my_count('a')}, #{my_hash.my_count}, #{my_hash.my_count(&bproc)}"
+p '----- my_count method w/Hash & block / arg -----'
+puts "#{my_hash.count {|e| e.is_a?(Array) }}, #{my_hash.count(["a", 1])}"
+puts "#{my_hash.my_count {|e| e.is_a?(Array) }}, #{my_hash.my_count(["a", 1])}"
+p '----- my_count method w/Ranges num -----'
+puts "#{(1..9).count(2)}, #{(1..9).count(&:odd?)}, #{(1..9).count(&aproc)}, #{(1..9).count { |e| e.zero? }}"
+puts "#{(1..9).my_count(2)}, #{(1..9).my_count(&:odd?)}, #{(1..9).my_count(&aproc)}, #{(1..9).my_count { |e| e.zero? }}"
+p '----- my_count method w/Ranges str -----'
+puts "#{('A'..'E').count(2)}, #{('A'..'E').count('B')}, #{('A'..'E').count(&bproc)}, #{('A'..'E').count { |e| e.is_a?(String) }}"
+puts "#{('A'..'E').my_count(2)}, #{('A'..'E').my_count('B')}, #{('A'..'E').my_count(&bproc)}, #{('A'..'E').my_count { |e| e.is_a?(String) }}"
+p '======================================'
