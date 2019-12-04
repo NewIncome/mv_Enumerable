@@ -116,36 +116,37 @@ def multiply_els(arr)
   arr.my_inject(:*)
 end
 
-my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 my_n_array = [1, 2, 3, 4]
-
 my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 aproc = proc { |e| e.even? }
 bproc = proc { |e| e.length == 2 }
 cproc = proc { |a, b| a + b }
 p '======================================'
-p '======== My_INJECT method tests ========'
-p '----- my_inject method w/Array & Block / Symbol -----'
-puts "#{my_n_array.inject { |a, b| a * b }}, #{my_n_array.inject(:+)}"
-puts "#{my_n_array.my_inject { |a, b| a * b }}, #{my_n_array.my_inject(:+)}"
-p '----- my_inject method w/Array & Symbol w/arg -----'
-puts "#{my_n_array.inject(1, :*)}, #{my_n_array.inject(100, :/)}"
-puts "#{my_n_array.my_inject(1, :*)}, #{my_n_array.my_inject(100, :/)}"
-p '----- my_inject method w/Array & Block w/arg -----'
-puts my_n_array.inject(3) { |a, b| a * b }
-puts my_n_array.my_inject(3) { |a, b| a * b }
-p '----- my_inject method w/Hashes -----'
-print my_hash.inject { |a, b| a + b }; puts
-print my_hash.my_inject { |a, b| a + b }; puts
-p '--- test 2 ---'
-print my_hash.inject(:+); puts
-print my_hash.my_inject(:+); puts
-p '--- test 3 ---'
-print my_hash.inject(&cproc); puts
-print my_hash.my_inject(&cproc); puts
-p '----- my_inject method w/Ranges -----'
-puts "#{(1..3).inject(:+)}, #{(1..3).inject(3) { |a, b| a * b }}, #{(1..3).inject(3) { |a, b| a * (b+1) }}"
-puts "#{(1..3).my_inject(:+)}, #{(1..3).my_inject(3) { |a, b| a * b }}, #{(1..3).my_inject(3) { |a, b| a * (b+1) }}"
-p '======================================'
+p '======== My_MAP method tests ========'
+p '----- my_map method w/Array & argument -----'
+p [2, 3, 2].map
+p [2, 3, 2].my_map
+p [2, 3, 2].map { |e| e * e }
+p [2, 3, 2].my_map { |e| e * e }
+p [2, 3, 2].map { 'cat' }
+p [2, 3, 2].my_map { 'cat' }
+p [2, 3, 2].map { |e| e.even? }
+p [2, 3, 2].my_map { |e| e.even? }
+p '----- my_map method w/Hash -----'
+p my_hash.map { |e| e + e }
+p my_hash.my_map { |e| e + e }
+p my_hash.map { |e| e + ['I'] }
+p my_hash.my_map { |e| e + ['I'] }
+p '----- my_map method w/Range -----'
+p (1..4).map { |e| e + e }
+p (1..4).my_map { |e| e + e }
+p (1..4).map { |e| e * e }
+p (1..4).my_map { |e| e * e }
+p (1..4).map { 'cat' }
+p (1..4).my_map { 'cat' }
+p '----- my_map method w/Proc -----'         # working perfectly with a PROC
+p "#{[2, 3, 2].map(&aproc)}, #{[2, 3, 2].map(&:odd?)}"   # <-=======
+p "#{[2, 3, 2].my_map(&aproc)}, #{[2, 3, 2].my_map(&:odd?)}"   # <-=======
+p '----- my_map method w/Proc & Block -----'
 
-p multiply_els(1..6)
+p '======================================'
