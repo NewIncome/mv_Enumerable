@@ -80,10 +80,7 @@ module Enumerable
   def my_map
     arr = []
     if block_given?
-      my_each do |e|
-        elm = yield e
-        arr << elm
-      end
+      my_each { |e| arr << (yield e) }
       arr
     else
       to_enum(__method__)
@@ -122,42 +119,33 @@ end
 my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 my_n_array = [1, 2, 3, 4]
 
-puts
-p '----- my_inject method with array -----'
-p(my_n_array.inject { |a, b| a * b })
-p(my_n_array.my_inject { |a, b| a * b })
-p '----- my_inject method with Symbol -----'
-p my_n_array.inject(1, :*)
-p my_n_array.my_inject(1, :*)
-p(my_n_array.inject(3) { |a, b| a * b })
-p(my_n_array.my_inject(3) { |a, b| a * b })
-p my_n_array.inject(:+)
-p my_n_array.my_inject(:+)
-
 my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
 aproc = proc { |e| e.even? }
 bproc = proc { |e| e.length == 2 }
+cproc = proc { |a, b| a + b }
 p '======================================'
-p '======== My_COUNT method tests ========'
-p '----- my_count method w/Array & argument -----'
-puts [2, 3, 2].count(2)
-puts [2, 3, 2].my_count(2)
-p '----- my_count method w/Array & block / proc -----'
-puts "#{[2, 3, 2].count { |e| (e % 3).zero? }}, #{[2, 3, 2].count(&aproc)}"
-puts "#{[2, 3, 2].my_count { |e| (e % 3).zero? }}, #{[2, 3, 2].my_count(&aproc)}"
-p '----- my_count method w/Array & no block no arg -----'
-puts "#{[2, 3, 2].count}, #{[2, false, nil].count}, #{[false, nil, false].count}, #{[].count}"
-puts "#{[2, 3, 2].my_count}, #{[2, false, nil].my_count}, #{[false, nil, false].my_count}, #{[].my_count}"
-p '----- my_count method w/Hash & argument / no arg / arg-proc -----'
-puts "#{my_hash.count('a')}, #{my_hash.count}, #{my_hash.count(&bproc)}"
-puts "#{my_hash.my_count('a')}, #{my_hash.my_count}, #{my_hash.my_count(&bproc)}"
-p '----- my_count method w/Hash & block / arg -----'
-puts "#{my_hash.count {|e| e.is_a?(Array) }}, #{my_hash.count(["a", 1])}"
-puts "#{my_hash.my_count {|e| e.is_a?(Array) }}, #{my_hash.my_count(["a", 1])}"
-p '----- my_count method w/Ranges num -----'
-puts "#{(1..9).count(2)}, #{(1..9).count(&:odd?)}, #{(1..9).count(&aproc)}, #{(1..9).count { |e| e.zero? }}"
-puts "#{(1..9).my_count(2)}, #{(1..9).my_count(&:odd?)}, #{(1..9).my_count(&aproc)}, #{(1..9).my_count { |e| e.zero? }}"
-p '----- my_count method w/Ranges str -----'
-puts "#{('A'..'E').count(2)}, #{('A'..'E').count('B')}, #{('A'..'E').count(&bproc)}, #{('A'..'E').count { |e| e.is_a?(String) }}"
-puts "#{('A'..'E').my_count(2)}, #{('A'..'E').my_count('B')}, #{('A'..'E').my_count(&bproc)}, #{('A'..'E').my_count { |e| e.is_a?(String) }}"
+p '======== My_INJECT method tests ========'
+p '----- my_inject method w/Array & Block / Symbol -----'
+puts "#{my_n_array.inject { |a, b| a * b }}, #{my_n_array.inject(:+)}"
+puts "#{my_n_array.my_inject { |a, b| a * b }}, #{my_n_array.my_inject(:+)}"
+p '----- my_inject method w/Array & Symbol w/arg -----'
+puts "#{my_n_array.inject(1, :*)}, #{my_n_array.inject(100, :/)}"
+puts "#{my_n_array.my_inject(1, :*)}, #{my_n_array.my_inject(100, :/)}"
+p '----- my_inject method w/Array & Block w/arg -----'
+puts my_n_array.inject(3) { |a, b| a * b }
+puts my_n_array.my_inject(3) { |a, b| a * b }
+p '----- my_inject method w/Hashes -----'
+print my_hash.inject { |a, b| a + b }; puts
+print my_hash.my_inject { |a, b| a + b }; puts
+p '--- test 2 ---'
+print my_hash.inject(:+); puts
+print my_hash.my_inject(:+); puts
+p '--- test 3 ---'
+print my_hash.inject(&cproc); puts
+print my_hash.my_inject(&cproc); puts
+p '----- my_inject method w/Ranges -----'
+puts "#{(1..3).inject(:+)}, #{(1..3).inject(3) { |a, b| a * b }}, #{(1..3).inject(3) { |a, b| a * (b+1) }}"
+puts "#{(1..3).my_inject(:+)}, #{(1..3).my_inject(3) { |a, b| a * b }}, #{(1..3).my_inject(3) { |a, b| a * (b+1) }}"
 p '======================================'
+
+p multiply_els(1..6)
