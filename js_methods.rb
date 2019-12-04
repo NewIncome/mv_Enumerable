@@ -77,9 +77,11 @@ module Enumerable
     end
   end
 
-  def my_map
+  def my_map(&zproc)
     arr = []
-    if block_given?
+    if block_given? && zproc.is_a?(Proc)
+      my_each { |e| zproc.call(e) }
+    elsif block_given?
       my_each { |e| arr << (yield e) }
       arr
     else
@@ -93,60 +95,15 @@ module Enumerable
     if block_given? || !sym.empty?
       my_each do |e|
         acc = e and next if acc.nil?
-        acc = if block_given?
-                yield acc, e
-              else
-                acc.send(sym, e)
-              end
+        acc = block_given? ? (yield acc, e) : acc.send(sym, e)
       end
     else
       to_enum(__method__)
     end
     acc
   end
-
-  def my_map_bproc(&bproc)
-    arr = []
-    my_each { |e| arr << bproc.call(e) }
-    arr
-  end
 end
 
 def multiply_els(arr)
   arr.my_inject(:*)
 end
-
-my_n_array = [1, 2, 3, 4]
-my_hash = { 'a' => 1, 'b' => 2, 'c': 3, 'd': 4 }
-aproc = proc { |e| e.even? }
-bproc = proc { |e| e.length == 2 }
-cproc = proc { |a, b| a + b }
-p '======================================'
-p '======== My_MAP method tests ========'
-p '----- my_map method w/Array & argument -----'
-p [2, 3, 2].map
-p [2, 3, 2].my_map
-p [2, 3, 2].map { |e| e * e }
-p [2, 3, 2].my_map { |e| e * e }
-p [2, 3, 2].map { 'cat' }
-p [2, 3, 2].my_map { 'cat' }
-p [2, 3, 2].map { |e| e.even? }
-p [2, 3, 2].my_map { |e| e.even? }
-p '----- my_map method w/Hash -----'
-p my_hash.map { |e| e + e }
-p my_hash.my_map { |e| e + e }
-p my_hash.map { |e| e + ['I'] }
-p my_hash.my_map { |e| e + ['I'] }
-p '----- my_map method w/Range -----'
-p (1..4).map { |e| e + e }
-p (1..4).my_map { |e| e + e }
-p (1..4).map { |e| e * e }
-p (1..4).my_map { |e| e * e }
-p (1..4).map { 'cat' }
-p (1..4).my_map { 'cat' }
-p '----- my_map method w/Proc -----'         # working perfectly with a PROC
-p "#{[2, 3, 2].map(&aproc)}, #{[2, 3, 2].map(&:odd?)}"   # <-=======
-p "#{[2, 3, 2].my_map(&aproc)}, #{[2, 3, 2].my_map(&:odd?)}"   # <-=======
-p '----- my_map method w/Proc & Block -----'
-
-p '======================================'
