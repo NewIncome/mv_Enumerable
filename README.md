@@ -33,7 +33,7 @@ Here are examples of the coding logic for the _my_any?_, _my_none?_ and _my_all?
 ![logic truth-table](img/any_all_none-truthtable.png)
 
 Also a complete tasks guide has been made for this project so the steps can be seen thoroughly in this [Pivotal Tracker](https://www.pivotaltracker.com/n/projects/2423734) site.
-And for additional testing here is a [txt file](info/Enumerable methods, manual test) with manual written test.
+And for additional testing here is a [txt file](info/Enumerable methods, manual tests) with manual written test.
 
 
 ## Technologies used:
