@@ -22,6 +22,16 @@ The following where the methods created, each of them identical to the original 
 - A test case for the `my_inject` by creating a method called `multiply_els` which multiplies all the elements of the array together by using 'my_inject'.
 - [x] Modified the 'my_map' method to take a proc instead.
 
+Here are examples of the coding logic for the _my_any?_, _my_none?_ and _my_all?_ methods:
+
+![my_any logic](img/my_any-logic.png)
+
+![my_none logic](img/my_none-logic.png)
+
+![my_all logic](img/my_all-logic.png)
+
+![logic truth-table](img/any_all_none-truthtable.png)
+
 Also a complete tasks guide has been made for this project so the steps can be seen thoroughly in this [Pivotal Tracker](https://www.pivotaltracker.com/n/projects/2423734) site.
 
 
